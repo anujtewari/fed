@@ -35,13 +35,18 @@ func TestSearch__ACHName(t *testing.T) {
 	require.Equal(t, http.StatusOK, w.Code)
 
 	var wrapper struct {
-		ACHParticipants []*fed.ACHParticipant `json:"achParticipants"`
+		ACHParticipants  []*fed.ACHParticipant  `json:"achParticipants"`
+		WIREParticipants []*fed.WIREParticipant `json:"wireParticipants"`
 	}
 	require.Contains(t, w.Body.String(), "achParticipants")
 	require.NotContains(t, w.Body.String(), "wireParticipants")
 
 	err = json.NewDecoder(w.Body).Decode(&wrapper)
 	require.NoError(t, err)
+
+	if wrapper.WIREParticipants != nil {
+		t.Errorf("Wire participants should be nil")
+	}
 
 	for _, p := range wrapper.ACHParticipants {
 		if !strings.Contains(p.CustomerName, strings.ToUpper("FARM")) {
@@ -66,7 +71,8 @@ func TestSearch__ACHRoutingNumber(t *testing.T) {
 	require.Equal(t, http.StatusOK, w.Code)
 
 	var wrapper struct {
-		ACHParticipants []*fed.ACHParticipant `json:"achParticipants"`
+		ACHParticipants  []*fed.ACHParticipant  `json:"achParticipants"`
+		WIREParticipants []*fed.WIREParticipant `json:"wireParticipants"`
 	}
 
 	require.Contains(t, w.Body.String(), "achParticipants")
@@ -74,6 +80,10 @@ func TestSearch__ACHRoutingNumber(t *testing.T) {
 
 	err = json.NewDecoder(w.Body).Decode(&wrapper)
 	require.NoError(t, err)
+
+	if wrapper.WIREParticipants != nil {
+		t.Errorf("Wire participants should be nil")
+	}
 
 	for _, p := range wrapper.ACHParticipants {
 		if strings.HasPrefix(p.RoutingNumber, "044") {
@@ -99,13 +109,18 @@ func TestSearch__ACHCity(t *testing.T) {
 	require.Equal(t, http.StatusOK, w.Code)
 
 	var wrapper struct {
-		ACHParticipants []*fed.ACHParticipant `json:"achParticipants"`
+		ACHParticipants  []*fed.ACHParticipant  `json:"achParticipants"`
+		WIREParticipants []*fed.WIREParticipant `json:"wireParticipants"`
 	}
 	require.Contains(t, w.Body.String(), "achParticipants")
 	require.NotContains(t, w.Body.String(), "wireParticipants")
 
 	err = json.NewDecoder(w.Body).Decode(&wrapper)
 	require.NoError(t, err)
+
+	if wrapper.WIREParticipants != nil {
+		t.Errorf("Wire participants should be nil")
+	}
 
 	for _, p := range wrapper.ACHParticipants {
 		if !strings.Contains(p.City, strings.ToUpper("CALDWELL")) {
@@ -130,7 +145,8 @@ func TestSearch__ACHState(t *testing.T) {
 	require.Equal(t, http.StatusOK, w.Code)
 
 	var wrapper struct {
-		ACHParticipants []*fed.ACHParticipant `json:"achParticipants"`
+		ACHParticipants  []*fed.ACHParticipant  `json:"achParticipants"`
+		WIREParticipants []*fed.WIREParticipant `json:"wireParticipants"`
 	}
 
 	require.Contains(t, w.Body.String(), "achParticipants")
@@ -138,6 +154,10 @@ func TestSearch__ACHState(t *testing.T) {
 
 	err = json.NewDecoder(w.Body).Decode(&wrapper)
 	require.NoError(t, err)
+
+	if wrapper.WIREParticipants != nil {
+		t.Errorf("Wire participants should be nil")
+	}
 
 	for _, p := range wrapper.ACHParticipants {
 		if !strings.Contains(p.State, strings.ToUpper("OH")) {
@@ -162,7 +182,12 @@ func TestSearch__ACHPostalCode(t *testing.T) {
 	require.Equal(t, http.StatusOK, w.Code)
 
 	var wrapper struct {
-		ACHParticipants []*fed.ACHParticipant `json:"achParticipants"`
+		ACHParticipants  []*fed.ACHParticipant  `json:"achParticipants"`
+		WIREParticipants []*fed.WIREParticipant `json:"wireParticipants"`
+	}
+
+	if wrapper.WIREParticipants != nil {
+		t.Errorf("Wire participants should be nil")
 	}
 
 	require.Contains(t, w.Body.String(), "achParticipants")
@@ -194,11 +219,16 @@ func TestSearch__ACH(t *testing.T) {
 	require.Equal(t, http.StatusOK, w.Code)
 
 	var wrapper struct {
-		ACHParticipants []*fed.ACHParticipant `json:"achParticipants"`
+		ACHParticipants  []*fed.ACHParticipant  `json:"achParticipants"`
+		WIREParticipants []*fed.WIREParticipant `json:"wireParticipants"`
 	}
 
 	err = json.NewDecoder(w.Body).Decode(&wrapper)
 	require.NoError(t, err)
+
+	if wrapper.WIREParticipants != nil {
+		t.Errorf("Wire participants should be nil")
+	}
 
 	for _, p := range wrapper.ACHParticipants {
 		if !strings.Contains(p.CustomerName, strings.ToUpper("Farmer")) {
@@ -255,6 +285,7 @@ func TestSearch__WIREName(t *testing.T) {
 	require.Equal(t, http.StatusOK, w.Code)
 
 	var wrapper struct {
+		ACHParticipants  []*fed.ACHParticipant  `json:"achParticipants"`
 		WIREParticipants []*fed.WIREParticipant `json:"wireParticipants"`
 	}
 
@@ -263,6 +294,10 @@ func TestSearch__WIREName(t *testing.T) {
 
 	err = json.NewDecoder(w.Body).Decode(&wrapper)
 	require.NoError(t, err)
+
+	if wrapper.ACHParticipants != nil {
+		t.Errorf("ACH participants should be nil")
+	}
 
 	for _, p := range wrapper.WIREParticipants {
 		if !strings.Contains(p.CustomerName, strings.ToUpper("Midwest")) {
@@ -289,6 +324,7 @@ func TestSearch__WIRERoutingNumber(t *testing.T) {
 	}
 
 	var wrapper struct {
+		ACHParticipants  []*fed.ACHParticipant  `json:"achParticipants"`
 		WIREParticipants []*fed.WIREParticipant `json:"wireParticipants"`
 	}
 
@@ -297,6 +333,10 @@ func TestSearch__WIRERoutingNumber(t *testing.T) {
 
 	err = json.NewDecoder(w.Body).Decode(&wrapper)
 	require.NoError(t, err)
+
+	if wrapper.ACHParticipants != nil {
+		t.Errorf("ACH participants should be nil")
+	}
 
 	for _, p := range wrapper.WIREParticipants {
 		if !strings.Contains(p.RoutingNumber, "091905114") {
@@ -323,6 +363,7 @@ func TestSearch__WIREState(t *testing.T) {
 	}
 
 	var wrapper struct {
+		ACHParticipants  []*fed.ACHParticipant  `json:"achParticipants"`
 		WIREParticipants []*fed.WIREParticipant `json:"wireParticipants"`
 	}
 
@@ -331,6 +372,10 @@ func TestSearch__WIREState(t *testing.T) {
 
 	err = json.NewDecoder(w.Body).Decode(&wrapper)
 	require.NoError(t, err)
+
+	if wrapper.ACHParticipants != nil {
+		t.Errorf("ACH participants should be nil")
+	}
 
 	for _, p := range wrapper.WIREParticipants {
 		if !strings.Contains(p.State, strings.ToUpper("IA")) {
@@ -357,6 +402,7 @@ func TestSearch__WIRECity(t *testing.T) {
 	}
 
 	var wrapper struct {
+		ACHParticipants  []*fed.ACHParticipant  `json:"achParticipants"`
 		WIREParticipants []*fed.WIREParticipant `json:"wireParticipants"`
 	}
 
@@ -365,6 +411,10 @@ func TestSearch__WIRECity(t *testing.T) {
 
 	err = json.NewDecoder(w.Body).Decode(&wrapper)
 	require.NoError(t, err)
+
+	if wrapper.ACHParticipants != nil {
+		t.Errorf("ACH participants should be nil")
+	}
 
 	for _, p := range wrapper.WIREParticipants {
 		if !strings.Contains(p.City, strings.ToUpper("IOWA CITY")) {
@@ -391,6 +441,7 @@ func TestSearch__WIRE(t *testing.T) {
 	}
 
 	var wrapper struct {
+		ACHParticipants  []*fed.ACHParticipant  `json:"achParticipants"`
 		WIREParticipants []*fed.WIREParticipant `json:"wireParticipants"`
 	}
 
@@ -399,6 +450,10 @@ func TestSearch__WIRE(t *testing.T) {
 
 	err = json.NewDecoder(w.Body).Decode(&wrapper)
 	require.NoError(t, err)
+
+	if wrapper.ACHParticipants != nil {
+		t.Errorf("ACH participants should be nil")
+	}
 
 	for _, p := range wrapper.WIREParticipants {
 		if !strings.Contains(p.CustomerName, strings.ToUpper("Midwest")) {
@@ -500,6 +555,7 @@ func TestSearch__WIREStateSoftLimit(t *testing.T) {
 	}
 
 	var wrapper struct {
+		ACHParticipants  []*fed.ACHParticipant  `json:"achParticipants"`
 		WIREParticipants []*fed.WIREParticipant `json:"wireParticipants"`
 	}
 
@@ -508,6 +564,10 @@ func TestSearch__WIREStateSoftLimit(t *testing.T) {
 
 	err = json.NewDecoder(w.Body).Decode(&wrapper)
 	require.NoError(t, err)
+
+	if wrapper.ACHParticipants != nil {
+		t.Errorf("ACH participants should be nil")
+	}
 
 	if len(wrapper.WIREParticipants) != 100 {
 		t.Errorf("exceeded the limit: %d", len(wrapper.WIREParticipants))
@@ -532,6 +592,7 @@ func TestSearch__WIREStateLimit(t *testing.T) {
 	}
 
 	var wrapper struct {
+		ACHParticipants  []*fed.ACHParticipant  `json:"achParticipants"`
 		WIREParticipants []*fed.WIREParticipant `json:"wireParticipants"`
 	}
 
@@ -540,6 +601,10 @@ func TestSearch__WIREStateLimit(t *testing.T) {
 
 	err = json.NewDecoder(w.Body).Decode(&wrapper)
 	require.NoError(t, err)
+
+	if wrapper.ACHParticipants != nil {
+		t.Errorf("ACH participants should be nil")
+	}
 
 	if len(wrapper.WIREParticipants) != 110 {
 		t.Errorf("exceeded the limit: %d", len(wrapper.WIREParticipants))
@@ -564,6 +629,7 @@ func TestSearch__WIREStateHardLimit(t *testing.T) {
 	}
 
 	var wrapper struct {
+		ACHParticipants  []*fed.ACHParticipant  `json:"achParticipants"`
 		WIREParticipants []*fed.WIREParticipant `json:"wireParticipants"`
 	}
 
@@ -572,6 +638,10 @@ func TestSearch__WIREStateHardLimit(t *testing.T) {
 
 	err = json.NewDecoder(w.Body).Decode(&wrapper)
 	require.NoError(t, err)
+
+	if wrapper.ACHParticipants != nil {
+		t.Errorf("ACH participants should be nil")
+	}
 
 	if len(wrapper.WIREParticipants) != 500 {
 		t.Errorf("exceeded the limit: %d", len(wrapper.WIREParticipants))
